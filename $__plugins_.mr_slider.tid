@@ -1,0 +1,308 @@
+author: Mohammad Rahmani
+core-version: 5.1.17
+created: 20181108214355356
+creator: Mohammad
+description: Slider: Wlakthrogh, linked list and guided help
+list: readme license release
+modified: 20181108215010695
+modifier: Mohammad
+plugin-type: plugin
+title: $:/plugins/.mr/slider
+type: application/json
+version: 1.0.1
+
+{
+    "tiddlers": {
+        "$:/plugins/.mr/slider/viewtemplate/slider-tiddler": {
+            "text": "\\define draggable-list-of-slides()\n <div class=\"sliderTiddler-slide-list\">\n    <h2>List of slides</h2>\n    <h4>Drag and drop your slides (tiddlers) here to add them to this slider or reorder the list</h4>\n    <ol>\n      <<list-tagged-draggable \n      tag:\"\"\"$(currentTiddler)$\"\"\"\n      subFilter:\"!tag[slideFooter]\"\n      itemTemplate:\"$:/plugins/.mr/slider/draggable-template\"\n      emptyMessage:\"You don't have any slide in this presentation\"\n      >>\n    </ol>\n </div>    \n\\end\n\n\\define show-slider-header()\n  <div class=\"sliderTiddler-header\">\n    <b>Slider caption:</b> {{!!caption}}<br>\n    <b>Slider tag:</b> {{!!title}}<br>\n    <b>Number of slides:</b> <$count filter=\"[tag<currentTiddler>!tag[slideFooter]]\"></$count><br>\n  </div>\n\\end  \n\n\\define show-slider-footer()\n <div class=\"sliderTiddler-footer\">\n  <b>Slide footer:</b>\n  <$list filter=\"[title[$(currentTiddler)$]addsuffix[ - Footer]]  +[has[title]]\" \n         variable=\"slide-footer\" \n         emptyMessage=<<newSlideFooter \"\"\"$(currentTiddler)$\"\"\">>\n  >       \n    <$link to=<<slide-footer>> tooltip=\"Click to edit\"> <<slide-footer>> </$link>\n    <$transclude tiddler=<<slide-footer>> field=\"text\" mode=\"block\"/> \n  </$list>\n  </div>\n\\end\n\n\\define show-slider-buttons()\n  <div class=\"sliderTiddler-buttons\">\n  <<newSlide param:\"\"\"$(currentTiddler)$\"\"\"\n     caption:\"New slide here\"\n     color:\"#00d\">>\n  <br>\n  <$button style=\"fill:#8058A5;\"\n      set=\"$:/plugins/.mr/slider/state!!current-slider\"\n      setTo={{!!title}}\n    >\n      {{$:/plugins/.mr/slider/images/slide.svg}} Set for presentation\n    </$button> \n  </div>\n\\end\n\n\n<$list filter=\"[is[current]tag[slider]]\">\n  <<show-slider-header>> <br>\n  <<show-slider-buttons>>\n  <<draggable-list-of-slides>> <br>\n  <<show-slider-footer>>\n</$list>\n",
+            "title": "$:/plugins/.mr/slider/viewtemplate/slider-tiddler",
+            "tags": "$:/tags/ViewTemplate",
+            "modifier": "Mohammad",
+            "modified": "20181102162542311",
+            "creator": "Mohammad",
+            "created": "20180527182942488",
+            "caption": "Slider Template"
+        },
+        "$:/plugins/.mr/slider/viewtemplate/navigation-buttons": {
+            "text": "\\define no-more-slides()\n<button class=\"tc-btn-invisible disabled\" disabled>{{$:/plugins/.mr/slider/images/stop.svg}}</button>\n\\end\n\n\\define previous-slide()\n    <$list filter=\"[tag<parent>!tag[slideFooter]before<currentTiddler>]\" \n           emptyMessage=<<no-more-slides>> >\n      <$button class=\"tc-btn-invisible buttons-no-outline\" \n        to={{!!title}} set=\"$:/plugins/.mr/slider/state\" \n        setTo={{!!title}} tooltip={{!!title}} >\n        {{$:/plugins/.mr/slider/images/slide-previous.svg}}\n      </$button>\n    </$list>\n\\end\n\n\\define next-slide()\n    <$list filter=\"[tag<parent>!tag[slideFooter]after<currentTiddler>]\" emptyMessage=<<no-more-slides>>>\n      <$button class=\"tc-btn-invisible buttons-no-outline\" to={{!!title}} \n        set=\"$:/plugins/.mr/slider/state\" \n        setTo={{!!title}} \n        tooltip={{!!title}} >\n        {{$:/plugins/.mr/slider/images/slide-next.svg}}\n      </$button>\n    </$list>\n\\end\n\n\\define slide-list()\n<div class=\"slider-tooltip\"> \n  <$button class=\"tc-btn-invisible buttons-no-outline\">{{$:/plugins/.mr/slider/images/slide-list.svg}}</$button>\n  <div class=\"slider-tooltiptext\">\n    <$macrocall $name=\"trackable-links\" tag=<<parent>> />\n  </div>\n</div>\n\\end\n\n\n\\define show-slidenumber()\n<$count filter='[tag<parent>!tag[slideFooter]allbefore:include<currentTiddler>]'/>\n\\end\n\n\n<$set name=\"parent\" value={{$:/plugins/.mr/slider/state!!current-slider}}>\n\n<$list filter=\"[is[current]tag<parent>!tag[slideFooter]]\"> <!-- only show slide number if it is belong to active slider and not tagged with slideFooter -->\n\n<div class=\"slider-slide-footer\">\n  <div class=\"slider-slide-footer-buttons\">\n    <<previous-slide>>\n    <<next-slide>>\n    <<slide-list>>\n  </div>\n  <div class=\"slider-slide-footer-text\"> <!--show all tiddlers tagged with slideFooter and parent as footer --> \n    <$list filter=\"[title<parent>addsuffix[ - Footer]]\" variable=\"slide-footer\">\n         <$transclude tiddler=<<slide-footer>> field=\"text\" mode=\"inline\"/> \n    </$list>\n  </div>\n  <div class=\"slider-slidenumber\">\n    <<show-slidenumber>>\n  </div>\n</div>\n\n</$list>\n\n</$set>\n\n",
+            "title": "$:/plugins/.mr/slider/viewtemplate/navigation-buttons",
+            "tags": "$:/tags/ViewTemplate",
+            "modifier": "Mohammad",
+            "modified": "20181108211138427",
+            "list-after": "$:/core/ui/ViewTemplate/body",
+            "creator": "Mohammad",
+            "created": "20180726134237633"
+        },
+        "$:/plugins/.mr/slider/toggle-slider-theme": {
+            "text": "<$reveal type=\"nomatch\" state=\"$:/plugins/.mr/slider/state/slider-theme\" text=\"dark\">\n  <$button style=\"fill:#8058A5;color:#8058A5;\"\n    tooltip=\"Set theme to dark\"\n  > {{$:/core/images/palette}}\n    <$action-setfield $tiddler=\"$:/plugins/.mr/slider/state/slider-theme\" text=\"dark\"/>\n    <$action-setfield $tiddler=\"$:/plugins/.mr/slider/stylesheet/theme/dark\"  tags=\"$:/tags/Stylesheet\"/>\n    <$action-setfield $tiddler=\"$:/plugins/.mr/slider/stylesheet/theme/light\" tags=\"\"/>\n  </$button>\n</$reveal>\n<$reveal type=\"nomatch\" state=\"$:/plugins/.mr/slider/state/slider-theme\" text=\"light\">\n  <$button style=\"fill:#8058A5;color:#8058A5;\"\n    tooltip=\"Set theme to light\"\n  > {{$:/core/images/palette}}\n    <$action-setfield $tiddler=\"$:/plugins/.mr/slider/state/slider-theme\" text=\"light\"/>\n    <$action-setfield $tiddler=\"$:/plugins/.mr/slider/stylesheet/theme/light\"  tags=\"$:/tags/Stylesheet\"/>\n    <$action-setfield $tiddler=\"$:/plugins/.mr/slider/stylesheet/theme/dark\" tags=\"\"/>\n  </$button>\n</$reveal>",
+            "title": "$:/plugins/.mr/slider/toggle-slider-theme",
+            "tags": "",
+            "modifier": "Mohammad",
+            "modified": "20181102154713183",
+            "creator": "Mohammad",
+            "created": "20181028155841125"
+        },
+        "$:/plugins/.mr/slider/toggle-slide-size": {
+            "text": "<$reveal type=\"nomatch\" state=\"$:/plugins/.mr/slider/state/slide-height\" text=\"zoomin-full-height\">\n  <$button style=\"fill:#8058A5;color:#8058A5;\"\n    tooltip=\"Single slide view\"\n    set=\"$:/plugins/.mr/slider/state/slide-height\" \n    setTo=\"zoomin-full-height\"\n  >\n    {{$:/core/images/full-screen-button}} \n    <$action-setfield $tiddler=\"$:/plugins/.mr/slider/state/slide-height\" story-view={{$:/view}} />\n    <$action-setfield $tiddler=\"$:/view\" text=\"zoomin\"/>\n    <$action-setfield $tiddler=\"$:/plugins/.mr/slider/stylesheet/slide-height\" tags=\"$:/tags/Stylesheet\"/>\n\n  </$button>\n</$reveal>\n<$reveal type=\"nomatch\" state=\"$:/plugins/.mr/slider/state/slide-height\" text=\"normal-height\">\n  <$button style=\"fill:#ff0000;color:#8058A5;\"\n    tooltip=\"Normal slide view\"\n    set=\"$:/plugins/.mr/slider/state/slide-height\" \n    setTo=\"normal-height\"\n  >\n    {{$:/core/images/full-screen-button}}\n    <$action-setfield $tiddler=\"$:/plugins/.mr/slider/stylesheet/slide-height\" tags=\"\"/>\n    <$action-setfield $tiddler=\"$:/view\" text={{$:/plugins/.mr/slider/state/slide-height!!story-view}} />\n  </$button>\n</$reveal>\n",
+            "title": "$:/plugins/.mr/slider/toggle-slide-size",
+            "tags": "",
+            "modifier": "Mohammad",
+            "modified": "20181028110803258",
+            "creator": "Mohammad",
+            "created": "20181028091342139"
+        },
+        "$:/plugins/.mr/slider/stylesheet/tooltip": {
+            "text": ".slider-tooltip {\n    position: relative;\n    display: inline-block;\n\n}\n\n.slider-tooltip .slider-tooltiptext {\n    visibility: hidden;\n    background-color: #ffffff;\n    color: #111111;\n    text-align: left;\n    border-radius: 6px;\n    padding: 5px 0;\n    min-width: 360px;\n    max-height: 60vh;\n    overflow-y: auto;\n\n    /* Position the tooltip */\n    position: absolute;\n    z-index: 1;\n    bottom: 100%;\n    left: 50%;\n    margin-left: -40px;\n    box-shadow:0 4px 10px 0 rgba(0,0,0,0.2),0 4px 20px 0 rgba(0,0,0,0.19)\n}\n\n.slider-tooltip:hover .slider-tooltiptext {\n    visibility: visible;\n}\n",
+            "type": "text/css",
+            "title": "$:/plugins/.mr/slider/stylesheet/tooltip",
+            "tags": "$:/tags/Stylesheet",
+            "modifier": "Mohammad",
+            "modified": "20181026122745802",
+            "creator": "Mohammad",
+            "created": "20180728144429505"
+        },
+        "$:/plugins/.mr/slider/stylesheet/theme/light": {
+            "text": "/* Set styles for the slider viewtemplate */\n\n[data-tags~=\"slider\"] {\n  border: 1px solid #999;\n  background-color: #f0efea;\n}\n\n.sliderTiddler-header,\n.sliderTiddler-footer {\n  background-color:#fcfdfe;\n  padding: 5px;\n}\n.sliderTiddler-buttons {\n  float:right;\n  padding:8px;\n}\n\n.sliderTiddler-slide-list{\n  min-height:250px;\n  color:#111;\n  background-color:#fff;\n  border-radius:3px;\n  padding:12px;\n}\n\n\n.slider-list {\n  background-color:#eee;\n  height: 400px; \n}\n",
+            "type": "text/css",
+            "title": "$:/plugins/.mr/slider/stylesheet/theme/light",
+            "tags": "$:/tags/Stylesheet",
+            "modifier": "Mohammad",
+            "modified": "20181102162519652",
+            "creator": "Mohammad",
+            "created": "20181028153618499"
+        },
+        "$:/plugins/.mr/slider/stylesheet/theme/dark": {
+            "text": "<pre>/* Set styles for the slider viewtemplate */\n\n[data-tags ~=\"{{$:/plugins/.mr/slider/state!!current-slider}}\"]  {\n    background-color:#d9edf7;\n    color:#31708f;\n}\n\n[data-tags~=\"slider\"] {\n  border: 1px solid #999;\n  background-color: #f0efea; \n}\n\n.sliderTiddler-header,\n.sliderTiddler-footer {\n  background-color:#fcfdfe;\n  padding: 5px;\n}\n.sliderTiddler-buttons {\n  float:right;\n  padding:8px;\n}\n\n.sliderTiddler-slide-list{\n  min-height:250px;\n  color:#dfdfdf;\n  background-color:#4e4a4a; /*ffffeb */\n  border-radius:3px;\n  padding:12px;\n}\n\n.sliderTiddler-slide-list .tc-tiddlylink      {  color:#dfdfdf;}\n.sliderTiddler-slide-list .tc-tiddlylink:hover{  color:#dfdfdf;}\n\n.slider-list {\n  text-shadow:none;\n  background-color:#4e4a4a;\n  height: 400px; \n}\n\n.slider-list a.tc-tiddlylink      {  color:#dfdfdf;}\n.slider-list a.tc-tiddlylink:hover{  color:#dfdfdf;}\n</pre>",
+            "type": "text/vnd.tiddlywiki",
+            "title": "$:/plugins/.mr/slider/stylesheet/theme/dark",
+            "tags": "",
+            "modifier": "Mohammad",
+            "modified": "20181102162519652",
+            "creator": "Mohammad",
+            "created": "20180722195027124"
+        },
+        "$:/plugins/.mr/slider/stylesheet/slide-list": {
+            "text": "<pre>/* The list of tiddler (toc) in sidebar */\n.slider-list details div a {\n     font-weight:normal; \n     font-size:0.95em;\n}\n</pre>",
+            "title": "$:/plugins/.mr/slider/stylesheet/slide-list",
+            "tags": "$:/tags/Stylesheet",
+            "modifier": "Mohammad",
+            "modified": "20181102155639550",
+            "creator": "Mohammad",
+            "created": "20181102155500083"
+        },
+        "$:/plugins/.mr/slider/stylesheet/slide-height": {
+            "text": "<pre>/* The size of tiddlers of curent slider can be dynamically set here */\n\n[data-tags ~=\"{{$:/plugins/.mr/slider/state!!current-slider}}\"] .tc-tiddler-body {\nmin-height: 70vh;\n}\n</pre>",
+            "title": "$:/plugins/.mr/slider/stylesheet/slide-height",
+            "tags": "",
+            "modifier": "Mohammad",
+            "modified": "20181108211755343",
+            "creator": "Mohammad",
+            "created": "20181028090101249"
+        },
+        "$:/plugins/.mr/slider/stylesheet/slide-footer": {
+            "text": ".slider-slide-footer {\n  display:flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n  .slider-slide-footer{  \n  position: absolute;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  box-sizing: border-box;\n  width: 100%;\n  padding: 5px;\n  background-color: #efefef;\n opacity: 0.55;\n}\n\n.slider-slide-footer:hover{\n  opacity: 1.0;   \n}\n\n.slider-slide-footer-buttons{\n  display:flex;\n  justify-content: space-around;\n  width:120px;\n  margin-left:5px;\n  outline:none;\n}\n\n .slider-slidenumber{\n    height: 22pt;\n    width: 22pt;\n    line-height:22pt;\n    border-radius: 50%;\n    text-align: center;\n    margin-right:5px;\n}\n\n.slider-slidenumber{\n    background: gray;\n    color: #fff;\n    font-size:1em;\n    font-weight:700;  \n}\n.buttons-no-outline {\n  outline:none;\n} /*remove the blue border on button focus */",
+            "type": "text/css",
+            "title": "$:/plugins/.mr/slider/stylesheet/slide-footer",
+            "tags": "$:/tags/Stylesheet",
+            "modifier": "Mohammad",
+            "modified": "20181108211510792",
+            "creator": "Mohammad",
+            "created": "20180907070611557"
+        },
+        "$:/plugins/.mr/slider/stylesheet/slide-background-class": {
+            "text": "/* Colors taked from [1] https://www.w3schools.com/colors/colors_names.asp \n[2] http://www.workwithcolor.com/color-chart-full-01.htm\n*/\n.MistyRose{background-color:#FFE4E1;}\n.LemonChiffon{background-color:#FFFACD;}\n.LavenderBlush{background-color:#FFF0F5;}\n.Lavender{background-color:#E6E6FA;}\n.Honeydew{background-color:#F0FFF0;}\n.LightCyan{background-color:#E0FFFF;}\n.AliceBlue{background-color:#F0F8FF;}\n.Cornsilk{background-color:#FFF8DC;}\n.Gainsboro{background-color:#DCDCDC;}\n.Bisque{background-color:#FFE4C4;}\n/* darker ones*/\n.Snow{background-color:#FFFAFA;}\n.PowderBlue{background-color:#B0E0E6}\n.Aquamarine{background-color:#7FFFD4;}\n.PaleGreen{background-color:#98FB98;}\n.Pink{background-color:#FFC0CB;}\n.LightSalmon{background-color:#FFA07A;}\n.Lime{background-color:#bfef45;}\n.Mint{background-color:#aaffc3;}\n.Beige{background-color:#fffac8;}\n.Appricot{background-color:#ffd8b1;}",
+            "type": "text/css",
+            "title": "$:/plugins/.mr/slider/stylesheet/slide-background-class",
+            "tags": "$:/tags/Stylesheet",
+            "modifier": "Mohammad",
+            "modified": "20181106212648471",
+            "creator": "Mohammad",
+            "created": "20181029071532524"
+        },
+        "$:/plugins/.mr/slider/state/slider-theme": {
+            "text": "light",
+            "title": "$:/plugins/.mr/slider/state/slider-theme",
+            "modifier": "Mohammad",
+            "modified": "20181102162519652",
+            "creator": "Mohammad",
+            "created": "20181028160441199"
+        },
+        "$:/plugins/.mr/slider/state/slide-height": {
+            "text": "normal-height",
+            "title": "$:/plugins/.mr/slider/state/slide-height",
+            "story-view": "classic",
+            "modifier": "Mohammad",
+            "modified": "20181108211755343",
+            "creator": "Mohammad",
+            "created": "20181028093955919"
+        },
+        "$:/plugins/.mr/slider/state": {
+            "created": "20181025210823564",
+            "creator": "Mohammad",
+            "text": "More on Slides",
+            "title": "$:/plugins/.mr/slider/state",
+            "modifier": "Mohammad",
+            "modified": "20181108212930749",
+            "current-slider": "Sl-Tutorial"
+        },
+        "$:/plugins/.mr/slider/slider-contents": {
+            "text": "@@color:red; Slider version: {{$:/plugins/.mr/slider/slider-contents!!version}}@@\n\nThe ''slider'' {{$:/plugins/.mr/slider/readme!!version}} plugin consists of the following tiddlers:\n<div style=\"background-color:#ffffaa;font-size:0.75rem;font-color:red;font-weight:300;padding-left:10px;margin-top:10px;\">\n$:/plugins/.mr/slider/manager/slider-list<br> may need be corrected in TW 5.1.18 for ''exclude'' atribute.\n</div>\n\n<ol style=\"background-color:#eee;padding:12px 36px;\"> \n  <$list filter=\"[all[shadows+tiddlers]search:title[$:/plugins/.mr/slider]sort[title]] [search:title[$:/plugins/.mr/slider]]\" variable=\"myTid\">\n    <li>\n      <$link to=<<myTid>> >\n        <$set name=\"listItem\" value={{{ [<myTid>removeprefix[$:/plugins/.mr/slider/]] }}} emptyValue=<<myTid>> >\n          <$text text=<<listItem>>/>\n        </$set>\n      </$link>\n    </li>\n  </$list>\n</ol>\n\n---\nTo edit: [[$:/plugins/.mr/slider/slider-contents]]",
+            "version": "1.0.1",
+            "title": "$:/plugins/.mr/slider/slider-contents",
+            "tags": "$:/tags/SideBar",
+            "modifier": "Mohammad",
+            "modified": "20181108211655432",
+            "creator": "Mohammad",
+            "created": "20180517082124259",
+            "caption": "Slider Contents"
+        },
+        "$:/plugins/.mr/slider/sidebar/slider-manager": {
+            "text": "\\define btn-label() Add slide to $(current-slider)$\n\n{{$:/plugins/.mr/slider/manager/new-slider}}{{$:/plugins/.mr/slider/toggle-slide-size}}{{$:/plugins/.mr/slider/toggle-slider-theme}}\n<$set name=\"current-slider\" value={{$:/plugins/.mr/slider/state!!current-slider}}>\n  <$macrocall $name=\"newSlide\" \n    param=<<current-slider>>\n    btn-caption=<<btn-label>> />\n</$set>\n{{$:/plugins/.mr/slider/manager/slider-list}}\n\n",
+            "title": "$:/plugins/.mr/slider/sidebar/slider-manager",
+            "tags": "$:/tags/SideBar",
+            "modifier": "Mohammad",
+            "modified": "20181106190932703",
+            "creator": "Mohammad",
+            "created": "20180527184455440",
+            "caption": "Slider Manager"
+        },
+        "$:/plugins/.mr/slider/manager/slider-list": {
+            "text": "<$importvariables filter=\"$:/plugins/.mr/slider/macro/modified-toc\">\n<$scrollable class='slider-list'>\n<div class=\"tc-table-of-contents\">\n  <<toc-se tag:\"slider\" exclude:\"-[tag[slideFooter]]\">>\n</div>\n</$scrollable>\n</$importvariables>\n\n\n",
+            "title": "$:/plugins/.mr/slider/manager/slider-list",
+            "tags": "",
+            "modifier": "Mohammad",
+            "modified": "20181106075550009",
+            "creator": "Mohammad",
+            "created": "20181103192144604"
+        },
+        "$:/plugins/.mr/slider/manager/new-slider": {
+            "text": "<$button tooltip=\"Create new slider\" class=\"tc-btn-visible\" style=\"fill:#8058A5;color:#8058A5;\">\n<$action-sendmessage $message=\"tm-new-tiddler\" caption=\"Set the caption ...\" tags=\"slider\"/>\n{{$:/plugins/.mr/slider/images/slide.svg}}\n</$button>",
+            "title": "$:/plugins/.mr/slider/manager/new-slider",
+            "tags": "$:/tags/Macro",
+            "modifier": "Mohammad",
+            "modified": "20181101100211112",
+            "creator": "Mohammad",
+            "created": "20180527185543611",
+            "caption": "Create new slider"
+        },
+        "$:/plugins/.mr/slider/macro/trackable-links": {
+            "text": "\\define trackable-links(tag:\"\")\n  <ol>\n    <$list filter=\"[tag[$tag$]!tag[slideFooter]]\" variable=\"myTid\">\n      <li>\n        <$button class=\"tc-btn-invisible\" style=\"text-align: left;\"\n          set=\"$:/plugins/.mr/slider/state\" \n          setTo=<<myTid>>\n          >\n            <$view tiddler=<<myTid>> field=\"title\"/>\n            <$action-navigate $to=<<myTid>>/>\n        </$button>\n      </li>\n    </$list>\n  </ol>\n\\end\n",
+            "title": "$:/plugins/.mr/slider/macro/trackable-links",
+            "tags": "$:/tags/Macro",
+            "modifier": "Mohammad",
+            "modified": "20181106210423954",
+            "creator": "Mohammad",
+            "created": "20180729154346545"
+        },
+        "$:/plugins/.mr/slider/macro/new-slide-here": {
+            "text": "\\define content()\nfill in the contents ....\n\\end\n\n\\define newSlide(param:\"\", btn-caption:\"New slide\", color:\"#8058A5\") \n<$button style=\"color:$color$; fill:$color$; margin-bottom:5px;\">\n{{$:/core/images/new-button}} $btn-caption$\n\n<$action-sendmessage $message=\"tm-new-tiddler\"\n    title=\"New slide...\"\n    text=<<content>>\n    tags=\"[[$param$]]\"\n/>\n</$button>\n\\end",
+            "title": "$:/plugins/.mr/slider/macro/new-slide-here",
+            "tags": "$:/tags/Macro",
+            "modifier": "Mohammad",
+            "modified": "20181101095654249",
+            "creator": "Mohammad",
+            "created": "20180504084439629",
+            "caption": "Create a new slide here"
+        },
+        "$:/plugins/.mr/slider/macro/new-slide-footer": {
+            "text": "\\define newSlideFooter(parent:\"\", btn-caption:\"New slide footer\", color:\"#8058A5\") \n<$button style=\"color:$color$; fill:$color$; margin-bottom:5px;\">\n{{$:/core/images/new-button}} $btn-caption$\n\n<$action-sendmessage $message=\"tm-new-tiddler\"\n    title=\"\"\"$parent$ - Footer\"\"\"\n    tags=\"slideFooter [[$parent$]]\"\n/>\n</$button>\n\\end",
+            "title": "$:/plugins/.mr/slider/macro/new-slide-footer",
+            "tags": "$:/tags/Macro",
+            "modifier": "Mohammad",
+            "modified": "20181102160018564",
+            "creator": "Mohammad",
+            "created": "20181004194512056",
+            "caption": "Create a new slide footer"
+        },
+        "$:/plugins/.mr/slider/macro/modified-toc": {
+            "text": "\\define toc-se(tag,sort:\"\",itemClassFilter,exclude,path)\n<$vars tag=\"\"\"$tag$\"\"\" sort=\"\"\"$sort$\"\"\" itemClassFilter=\"\"\"$itemClassFilter$\"\"\" excluded=\"\"\"$exclude$ -[[$tag$]]\"\"\" path=\"\"\"$path$/$tag$\"\"\">\n  <ol class=\"tc-toc toc-selective-expandable\">\n    <$list filter=\"\"\"[all[shadows+tiddlers]tag[$tag$]!has[draft.of]$sort$] -[[$tag$]] $exclude$\"\"\">\n      <$list filter=\"[all[current]toc-link[no]]\" variable=\"ignore\" emptyMessage=<<toc-selective-expandable-empty-message>> >\n        <$macrocall $name=toc-unlinked-selective-expandable-body tag=\"\"\"$tag$\"\"\" sort=\"\"\"$sort$\"\"\" itemClassFilter=\"\"\"$itemClassFilter$\"\"\" exclude=<<excluded>> path=<<path>> >\n      </$list>\n    </$list>\n  </ol>\n</$vars>\n\\end\n\n<!-- IMPORTANT Note: 11:22, 6th November 2018\nThis is a clone of toc-selective-expandable from TW5.1.17. In the new release the toc macro and specially the exclude attribute has been modified which does not allow exclude tiddlers (say -[tag[myTag]] and similar). So this clone of toc-selective-expandable (here called toc-se) is used.\n-->\n",
+            "title": "$:/plugins/.mr/slider/macro/modified-toc",
+            "tags": "",
+            "modifier": "Mohammad",
+            "modified": "20181106075517217",
+            "creator": "Mohammad",
+            "created": "20181103191736109"
+        },
+        "$:/plugins/.mr/slider/license": {
+            "text": "slider distributed under an MIT license.\n\nCopyright (c) 2018 [[Mohammad Rahmani|https://github.com/kookma]]\n\n<<<\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n<<<",
+            "title": "$:/plugins/.mr/slider/license",
+            "tags": "",
+            "modifier": "Mohammad",
+            "modified": "20181108205825632",
+            "creator": "Mohammad",
+            "created": "20181101134530634"
+        },
+        "$:/plugins/.mr/slider/images/stop.svg": {
+            "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" id=\"Capa_1\" x=\"0px\" y=\"0px\" viewBox=\"0 0 476.737 476.737\" enable-background=\"new 0 0 476.737 476.737\" xml:space=\"preserve\" width=\"22pt\" height=\"22pt\" fill=\"#C0C0C0\">\n<g><path d=\"M238.369,0C106.726,0,0,106.726,0,238.369c0,131.675,106.726,238.369,238.369,238.369      c131.675,0,238.369-106.694,238.369-238.369C476.737,106.726,370.043,0,238.369,0z M238.369,444.955      c-113.908,0-206.586-92.678-206.586-206.586S124.46,31.782,238.369,31.782s206.586,92.678,206.586,206.586 S352.277,444.955,238.369,444.955z\"/>\n<path d=\"M365.499,222.477h-254.26c-8.772,0-15.891,7.119-15.891,15.891      c0,8.74,7.119,15.891,15.891,15.891h254.26c8.74,0,15.891-7.151,15.891-15.891C381.39,229.597,374.239,222.477,365.499,222.477z\"/>\n</g>\n</svg>\n",
+            "type": "image/svg+xml",
+            "title": "$:/plugins/.mr/slider/images/stop.svg",
+            "modifier": "Mohammad",
+            "modified": "20181026123814264",
+            "creator": "Mohammad",
+            "created": "20180810102403934"
+        },
+        "$:/plugins/.mr/slider/images/slide.svg": {
+            "text": "<svg class=\"tc-image tc-image-button tc-image-slide-button\" width=\"22pt\" height=\"22pt\" viewBox=\"0 0 412 412\" enable-background=\"new 0 0 512 512\">\n<path id=\"video-4-icon\"\n     d=\"M 193.391,116.334 409.139,73.568 408.994,72.841 394.558,0 31.158,72.035 C 13.07,75.62 0,91.485 0,109.924 0,157.578 0,278.623 0,352.208 0,385.227 26.764,412 59.783,412 l 292.425,0 C 385.23,412 412,385.23 412,352.208 l 0,-235.133 0,-0.741 -218.609,0 z m 151.834,-86.166 41.139,27.529 -51.396,10.214 -41.17,-27.55 51.427,-10.193 z M 243.981,50.236 285.18,77.804 233.786,88.017 192.557,60.429 243.981,50.236 Z M 142.625,70.327 183.882,97.935 132.487,108.148 91.2,80.521 142.625,70.327 Z m -43.855,101.007 35,-35 52.426,0 -35,35 -52.426,0 z m 80.225,170.851 0,-120.841 98.548,60.422 -98.548,60.419 z m 75.533,-170.851 -52.426,0 35,-35 52.426,0 -35,35 z m 103.213,0 -52.426,0 35,-35 52.426,0 -35,35 z\"/>\n</svg>\n",
+            "type": "",
+            "title": "$:/plugins/.mr/slider/images/slide.svg",
+            "modifier": "Mohammad",
+            "modified": "20181028114009992",
+            "creator": "Birthe",
+            "created": "20150613112427442",
+            "caption": "Slider Icon"
+        },
+        "$:/plugins/.mr/slider/images/slide-previous.svg": {
+            "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" id=\"Capa_1\" x=\"0px\" y=\"0px\" viewBox=\"0 0 476.737 476.737\" enable-background=\"new 0 0 476.737 476.737\" xml:space=\"preserve\" width=\"22pt\" height=\"22pt\" fill=\"#C0C0C0\">\n<g>\n<path d=\"M238.369,0C106.726,0,0,106.726,0,238.369c0,131.675,106.726,238.369,238.369,238.369      c131.675,0,238.369-106.694,238.369-238.369C476.737,106.726,370.043,0,238.369,0z M238.369,444.955      c-113.908,0-206.586-92.678-206.586-206.586S124.46,31.782,238.369,31.782s206.586,92.678,206.586,206.586 S352.277,444.955,238.369,444.955z\" />\n<path d=\"M289.221,124.015c-6.198-6.198-16.273-6.198-22.47,0L163.68,227.086      c-3.115,3.115-4.64,7.183-4.64,11.283s1.526,8.168,4.64,11.283L266.75,352.722c6.198,6.166,16.273,6.166,22.47,0      c6.198-6.198,6.198-16.304,0-22.47l-91.883-91.883l91.883-91.883C295.418,140.288,295.418,130.213,289.221,124.015z\"/>\n</g>\n\n</svg>\n",
+            "type": "image/svg+xml",
+            "title": "$:/plugins/.mr/slider/images/slide-previous.svg",
+            "modifier": "Mohammad",
+            "modified": "20181026123750246",
+            "creator": "Mohammad",
+            "created": "20180810102356807"
+        },
+        "$:/plugins/.mr/slider/images/slide-next.svg": {
+            "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" id=\"Capa_1\" x=\"0px\" y=\"0px\" viewBox=\"0 0 474.449 474.449\" style=\"enable-background:new 0 0 474.449 474.449;\" xml:space=\"preserve\" width=\"22pt\" height=\"22pt\" fill=\"#C0C0C0\">\n<g><path d=\"M237.24,0C106.233,0,0.016,106.217,0.016,237.224S106.233,474.449,237.24,474.449 s237.193-106.217,237.193-237.224S368.248,0,237.24,0z M237.24,442.666c-113.273,0-205.442-92.169-205.442-205.442 S123.968,31.782,237.24,31.782s205.41,92.169,205.41,205.442C442.682,350.465,350.545,442.666,237.24,442.666z\" />\n<path d=\"M207.714,121.727c-6.198-6.198-16.273-6.198-22.47,0c-6.198,6.198-6.198,16.273,0,22.47      l91.883,91.883l-91.883,91.883c-6.198,6.198-6.198,16.273,0,22.47c6.198,6.198,16.273,6.198,22.47,0l103.071-103.039      c3.146-3.146,4.672-7.246,4.64-11.283c0-4.1-1.494-8.168-4.64-11.283L207.714,121.727z\"/></g>\n</svg>\n",
+            "type": "image/svg+xml",
+            "title": "$:/plugins/.mr/slider/images/slide-next.svg",
+            "modifier": "Mohammad",
+            "modified": "20181026123730037",
+            "creator": "Mohammad",
+            "created": "20180810102349659"
+        },
+        "$:/plugins/.mr/slider/images/slide-list.svg": {
+            "text": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" id=\"Capa_1\" x=\"0px\" y=\"0px\" viewBox=\"0 0 476.737 476.737\" enable-background=\"new 0 0 476.737 476.737\" xml:space=\"preserve\" width=\"22pt\" height=\"22pt\" fill=\"#C0C0C0\">\n<g>\n<path d=\"M238.369,0C106.726,0,0,106.726,0,238.369c0,131.675,106.726,238.369,238.369,238.369      c131.675,0,238.369-106.694,238.369-238.369C476.737,106.726,370.043,0,238.369,0z M238.369,444.955      c-113.908,0-206.586-92.678-206.586-206.586S124.46,31.782,238.369,31.782s206.586,92.678,206.586,206.586 S352.277,444.955,238.369,444.955z\" />\n<path d=\"M365.499,222.477h-254.26c-8.772,0-15.891,7.119-15.891,15.891      c0,8.74,7.119,15.891,15.891,15.891h254.26c8.74,0,15.891-7.151,15.891-15.891C381.39,229.597,374.239,222.477,365.499,222.477z\" />\n<path d=\"M365.499,127.13h-254.26c-8.772,0-15.891,7.119-15.891,15.891      c0,8.772,7.119,15.891,15.891,15.891h254.26c8.74,0,15.891-7.119,15.891-15.891C381.39,134.249,374.239,127.13,365.499,127.13z\" />\n<path d=\"M365.499,317.825h-254.26c-8.772,0-15.891,7.151-15.891,15.891      c0,8.74,7.119,15.891,15.891,15.891h254.26c8.74,0,15.891-7.151,15.891-15.891C381.39,324.976,374.239,317.825,365.499,317.825z\" />\n</g>\n</svg>\n",
+            "type": "image/svg+xml",
+            "title": "$:/plugins/.mr/slider/images/slide-list.svg",
+            "modifier": "Mohammad",
+            "modified": "20181026123709310",
+            "creator": "Mohammad",
+            "created": "20180810102339886"
+        },
+        "$:/plugins/.mr/slider/draggable-template": {
+            "text": "<li><$link to={{!!title}}>{{!!title}}</$link></li>",
+            "title": "$:/plugins/.mr/slider/draggable-template",
+            "modifier": "Mohammad",
+            "modified": "20181102162948014",
+            "creator": "Mohammad",
+            "created": "20180926153157940"
+        },
+        "$:/plugins/.mr/slider/release": {
+            "created": "20180905085705897",
+            "creator": "Mohammad",
+            "text": "!! Revision 1.0.1 \n<<<\n* Date: [9th Nov 2018]\n* Added background color class\n* Customized buttons in slide footer\n<<<\n\n!! Revision 1.0.0 \n<<<\n* Date: [1th Nov 2018]\n* Initial release\n<<<",
+            "version": "1.2",
+            "title": "$:/plugins/.mr/slider/release",
+            "modifier": "Mohammad",
+            "modified": "20181108214302339"
+        },
+        "$:/plugins/.mr/slider/readme": {
+            "created": "20181101134242465",
+            "creator": "Mohammad",
+            "text": "!! What ia slider?\nSlider is a small plugin to create connected contents like step by step tutorial or guided help, lessons and similar.\n\n!! Parts of slider\nEach slider has three main parts\n\n# Slider tiddler\n# Sliders contents (a set of tiddlers also called ''slides'')\n# Slider footer\n\n!! Slider tiddler\nThe slider tiddler is a tiddler tagged with `slider` and has \n\n* A header contains the slider details (like caption, tag, number of slides)\n* A slide list panel, to show the list of slides (e.g tiddlers) in the slider and let to add new slides by drag and drop and  re-order the slides in the slider\n* A footer, which is a tiddler contains one line text to be shown as a footer at the bottom of each slide\n\n!! Slides\nSlides (tiddlers) can be added to a specified slider in several ways including\n\n# By clicking on the `New slide` button on the slider manager tiddler\n# By dragging and droping a tiddler from sidebar into the `List of slides` on the slider manager tiddler\n# By opening the `sidebar / Slider Manager` tab and then clicking on the `Add slide to ...` button\n# By creating new tiddler and tagging with the specified slider title\n# By tagging an exisiting tiddler with the specified slider title\n\n!! Navigate among slides\n# Set the desired slider as the active slider by opening it (e.g. from sidebar) and clicking on `Set for presentation`\n# From the //List of slides// click on the first slide\n# One the footer of newly opened slide, click on the next button to navigate to the next slide\n# You can click on the slide-list button to open a local window and see the list of all slides, then you can click on any slide you like and jump to that slide\n# The slide footer also has a //previous// button which lets to navigate to previous slide in the list\n\n@@color:white;background:black;width:60%;margin:25px;padding:15px;\n''Note:'' Using //zoomin story// view may be more convenient when you use slider and navigate through slides. This is becuase, one tiddler is open at a time\n@@\n\n!! Slide footer\n* The slider footer can be used to add a text to all slides in a slider.\n* The slider footer is a tiddler and can be opned and edited\n* The slider footer has the same title of slider with `-Footer` prefix and tagged with `slideFooter`\n* The footer can be used for date stamp, author and institution name or any other information you like.\n* The footer can be formatted for color, size, font and etc. It can accept all the standard markup.\n\n@@color:white;background:black;width:50%;margin:25px;padding:15px;\n''Note:'' The footer is designed to be a single line. Use it for semantic purpose and try to keep it consistent.\n@@\n\n!! Colorify slides\nTo apply css classes to slides and colorify them\n\n* Fill in the `class` field of desired tiddler with a custom class\n* The slider has several classes ready to use like (~MistyRose, Bisque, Honeydew, ...)\n* For all available colors see $:/plugins/.mr/slider/stylesheet/slide-background-class\n\n!!! How use your own class\n<<<\n* Develop your classes inside a tiddler tagged with `$:/tags/Stylesheet`\n* \"\"\"This is a sample class\n `.mycls{color:white; background-color:#eee;}`\n\"\"\"\n<<<\n\n!! Slider theme\nThere is two different themes for slider manager and slider tiddler\n\n* Light theme\n* Dark theme\n\nTo change the slider theme, from sidebar open `Slider Manager` and click on theme button to choose the light or dark slider theme.\n\n!! Slide view mode\nThere is two view mode for slider\n\n* A ''normal slide view mode'' (tiddler in normal height and any story view mode)\n* A ''single slide view mode'' (tiddlers fill whole the screen height and use of `zoomin` story view)\n\nTo change the view mode, open the `Slider Manager` from sidebar and click on `Single slide view/Normal slide view` button\n\n!! Installation\nSimply drag and drop the below ling into your wiki\n* $:/plugins/.mr/slider",
+            "title": "$:/plugins/.mr/slider/readme",
+            "tags": "",
+            "modifier": "Mohammad",
+            "modified": "20181108214958859"
+        }
+    }
+}
