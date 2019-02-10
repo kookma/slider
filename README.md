@@ -1,3 +1,7 @@
+# Planned to be released summer 2019.
+
+Under development.
+
 # Slider
 Shiraz is a small TW5 plugin for creating walkthrough, tutorial, linked list of contents, guided help and even e-books.
 
