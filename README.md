@@ -1,4 +1,4 @@
-# Planned to be released summer 2019.
+# Planned to be released in summer 2019.
 
 Under development.
 
