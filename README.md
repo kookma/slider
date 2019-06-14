@@ -21,3 +21,7 @@ The slider plugin user interface contains three sections
 #### Method 2
 * Open the https://kookma.github.io/slider/
 * Drag and drop the plugin tiddler as described in readme
+
+
+## What is the origin of trail term?
+The Java Tutorials are practical guides for programmers who want to use the Java programming language to create applications. They include hundreds of complete, working examples, and dozens of lessons. Groups of related lessons are organized into "trails" [1](http://178.32.81.228/docs/books/tutorial/).
