@@ -1,7 +1,3 @@
-# Planned to be released in summer 2019.
-
-Under development.
-
 # Slider
 Slider is a small plugin to create an ordered set of tiddlers also called ''Trail''.
 
